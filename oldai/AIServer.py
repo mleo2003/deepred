@@ -28,7 +28,7 @@ logger = logging.getLogger("AIServer")
 # read by ai_retrieve requests.
 # initialize to something that is a valid backup input in most cases,
 # so eventual ai-retrieve-deadlocks can be resolved with a restart of this server. 
-ai_result = "move1"
+ai_result = None
 # global handle to actual AI
 Artificial = AI.AI()
 LastActions = []
