@@ -19,7 +19,7 @@ This program only works in Python 3.""")
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 JSON_FILE_PATH = os.path.join(SCRIPT_DIR, "battlestate.json")
-MOVES_FILE_PATH = os.path.join(SCRIPT_DIR, "AiMoves.txt")
+MOVES_FILE_PATH = os.path.join(SCRIPT_DIR, "AiMoves.json")
 
 #0 is off, 1 is ALL debug, 2 is core debug, 3 is minimal debug
 Debug_Code = 0
@@ -90,7 +90,7 @@ class AI(object):
         self._actualAction= {'0': 'move1', '1': 'move2', '2': 'move3', '3': 'move4', '4': 'switch1', '5': 'switch2', '6': 'switch3', '7': 'switch4', '8': 'switch5', '9': 'switch6', '10': 'useitem1', '11': 'useitem2'}
 
         with open(MOVES_FILE_PATH, 'r') as tempX:
-            self._moves = tempX.read().split(' ')
+            self._moves = json.load(tempX) # tempX.read().split(' ')
 
         self.statNames = ["atk","def","satk","sdef","spd","eva","acc"]
 
@@ -150,20 +150,16 @@ class AI(object):
                 for moveset in range(0, len(self.jsonlist[templocation]['party'][tempx]['moves'])):
                     self.MonData[allmons]['moves'][moveset] = {}
                     temptext1 = self.jsonlist[templocation]['party'][tempx]['moves'][moveset]['name'].replace(' ', '').lower().replace('-', '')
-                    for movelist in range(0, len(self._moves)):
-                        templist = self._moves[movelist].split(',')
-                        temptext2 = templist[0]
-                        if temptext2 == temptext1:
-                            self.MonData[allmons]['moves'][moveset]['name'] = templist[0]
-                            self.MonData[allmons]['moves'][moveset]['effect'] = templist[1]
-                            self.MonData[allmons]['moves'][moveset]['bp'] = int(templist[2])
-                            self.MonData[allmons]['moves'][moveset]['category'] = templist[3]
-                            self.MonData[allmons]['moves'][moveset]['type'] = templist[4]
-                            self.MonData[allmons]['moves'][moveset]['acc'] = int(templist[5])
-                            self.MonData[allmons]['moves'][moveset]['curpp'] = int(self.jsonlist[templocation]['party'][tempx]['moves'][moveset]['curpp'])
-                            self.MonData[allmons]['moves'][moveset]['pp'] = int(templist[6])
-                            self.MonData[allmons]['moves'][moveset]['effectchance'] = int(templist[7])
-                            break
+                    if temptext1 in self._moves:
+                        self.MonData[allmons]['moves'][moveset]['name'] = self._moves[temptext1]['name']
+                        self.MonData[allmons]['moves'][moveset]['effect'] = self._moves[temptext1]['effect']
+                        self.MonData[allmons]['moves'][moveset]['bp'] = int(self._moves[temptext1]['bp'])
+                        self.MonData[allmons]['moves'][moveset]['category'] = self._moves[temptext1]['category']
+                        self.MonData[allmons]['moves'][moveset]['type'] = self._moves[temptext1]['type']
+                        self.MonData[allmons]['moves'][moveset]['acc'] = int(self._moves[temptext1]['acc'])
+                        self.MonData[allmons]['moves'][moveset]['curpp'] = int(self.jsonlist[templocation]['party'][tempx]['moves'][moveset]['curpp'])
+                        self.MonData[allmons]['moves'][moveset]['pp'] = int(self._moves[temptext1]['pp'])
+                        self.MonData[allmons]['moves'][moveset]['effectchance'] = int(self._moves[temptext1]['effectchance'])
                 if self.jsonlist['battleState'][temptext]['party idx'] == allmons:
                     self.hp[allmons] = int(self.jsonlist['battleState']['enemypokemon']['hp'])
                     self.MonData[allmons] = {}
@@ -192,20 +188,16 @@ class AI(object):
                     for moveset in range(0, len(self.jsonlist['battleState']['enemypokemon']['moves'])):
                         self.MonData[allmons]['moves'][moveset] = {}
                         temptext1 = self.jsonlist['battleState']['enemypokemon']['moves'][moveset]['name'].replace(' ', '').lower().replace('-', '')
-                        for movelist in range(0, len(self._moves)):
-                            templist = self._moves[movelist].split(',')
-                            temptext2 = templist[0]
-                            if temptext2 == temptext1:
-                                self.MonData[allmons]['moves'][moveset]['name'] = templist[0]
-                                self.MonData[allmons]['moves'][moveset]['effect'] = templist[1]
-                                self.MonData[allmons]['moves'][moveset]['bp'] = int(templist[2])
-                                self.MonData[allmons]['moves'][moveset]['category'] = templist[3]
-                                self.MonData[allmons]['moves'][moveset]['type'] = templist[4]
-                                self.MonData[allmons]['moves'][moveset]['acc'] = int(templist[5])
-                                self.MonData[allmons]['moves'][moveset]['curpp'] = int(self.jsonlist['battleState']['enemypokemon']['moves'][moveset]['curpp'])
-                                self.MonData[allmons]['moves'][moveset]['pp'] = int(templist[6])
-                                self.MonData[allmons]['moves'][moveset]['effectchance'] = int(templist[7])
-                                break
+                        if temptext1 in self._moves:
+	                        self.MonData[allmons]['moves'][moveset]['name'] = self._moves[temptext1]['name']
+	                        self.MonData[allmons]['moves'][moveset]['effect'] = self._moves[temptext1]['effect']
+	                        self.MonData[allmons]['moves'][moveset]['bp'] = int(self._moves[temptext1]['bp'])
+	                        self.MonData[allmons]['moves'][moveset]['category'] = self._moves[temptext1]['category']
+	                        self.MonData[allmons]['moves'][moveset]['type'] = self._moves[temptext1]['type']
+	                        self.MonData[allmons]['moves'][moveset]['acc'] = int(self._moves[temptext1]['acc'])
+	                        self.MonData[allmons]['moves'][moveset]['curpp'] = int(self.jsonlist['battleState']['enemypokemon']['moves'][moveset]['curpp'])
+	                        self.MonData[allmons]['moves'][moveset]['pp'] = int(self._moves[temptext1]['pp'])
+	                        self.MonData[allmons]['moves'][moveset]['effectchance'] = int(self._moves[temptext1]['effectchance'])
 
         if self.jsonlist['battleState']['enemy type'] == 'WILD':
             self.hp[0] = int(self.jsonlist['battleState']['enemypokemon']['hp'])
@@ -234,20 +226,16 @@ class AI(object):
             for moveset in range(0, len(self.jsonlist['battleState']['enemypokemon']['moves'])):
                 self.MonData[0]['moves'][moveset] = {}
                 temptext1 = self.jsonlist['battleState']['enemypokemon']['moves'][moveset]['name'].replace(' ', '').lower().replace('-', '')
-                for movelist in range(0, len(self._moves)):
-                    templist = self._moves[movelist].split(',')
-                    temptext2 = templist[0]
-                    if temptext2 == temptext1:
-                        self.MonData[0]['moves'][moveset]['name'] = templist[0]
-                        self.MonData[0]['moves'][moveset]['effect'] = templist[1]
-                        self.MonData[0]['moves'][moveset]['bp'] = int(templist[2])
-                        self.MonData[0]['moves'][moveset]['category'] = templist[3]
-                        self.MonData[0]['moves'][moveset]['type'] = templist[4]
-                        self.MonData[0]['moves'][moveset]['acc'] = int(templist[5])
-                        self.MonData[0]['moves'][moveset]['curpp'] = int(self.jsonlist['battleState']['enemypokemon']['moves'][moveset]['curpp'])
-                        self.MonData[0]['moves'][moveset]['pp'] = int(templist[6])
-                        self.MonData[0]['moves'][moveset]['effectchance'] = int(templist[7])
-                        break
+                if temptext1 in self._moves:
+                    self.MonData[0]['moves'][moveset]['name'] = self._moves[temptext1]['name']
+                    self.MonData[0]['moves'][moveset]['effect'] = self._moves[temptext1]['effect']
+                    self.MonData[0]['moves'][moveset]['bp'] = int(self._moves[temptext1]['bp'])
+                    self.MonData[0]['moves'][moveset]['category'] = self._moves[temptext1]['category']
+                    self.MonData[0]['moves'][moveset]['type'] = self._moves[temptext1]['type']
+                    self.MonData[0]['moves'][moveset]['acc'] = int(self._moves[temptext1]['acc'])
+                    self.MonData[0]['moves'][moveset]['curpp'] = int(self.jsonlist['battleState']['enemypokemon']['moves'][moveset]['curpp'])
+                    self.MonData[0]['moves'][moveset]['pp'] = int(self._moves[temptext1]['pp'])
+                    self.MonData[0]['moves'][moveset]['effectchance'] = int(self._moves[temptext1]['effectchance'])
         self.PermMonData = copy.deepcopy(self.MonData)
         for tempx in range(6, self.trainparty+6):
             self.opponenthp[tempx] = self.PermMonData[tempx]['stats']['curhp']
